@@ -107,7 +107,7 @@ export default function SpeedDialTooltipOpen() {
         />
         <SpeedDialAction
           icon={<FileCopyIcon />}
-          tooltipTitle="ESRI JSON"
+          tooltipTitle="ESRI"
           tooltipOpen
           onClick={handleCopyEsriJSON}
         />

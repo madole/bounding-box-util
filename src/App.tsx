@@ -7,6 +7,7 @@ import useStore from "./store.ts";
 
 function App() {
   const clearState = useStore((state) => state.clearState);
+  const modalOpen = useStore((state) => state.modalOpen);
   const handleNewBoundingBox = () => {
     clearState();
   };
@@ -30,7 +31,7 @@ function App() {
           <BboxLayer />
         </MapLibre>
       </Box>
-      <Modal></Modal>
+      {modalOpen && <Modal></Modal>}
     </Box>
   );
 }

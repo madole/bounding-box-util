@@ -1,9 +1,25 @@
 import { create } from "zustand";
 import { devtools } from "zustand/middleware";
+import { GeoJSONFeature } from "maplibre-gl";
+
+type BBOXtype =
+  | {
+      type: "geojson";
+      data: GeoJSONFeature;
+    }
+  | {
+      type: "bbox_string";
+      data: string;
+    }
+  | {
+      type: "wkt";
+      data: string;
+    }
+  | null;
 
 type Store = {
-  bbox: string | null;
-  setBbox: (newBbox: string) => void;
+  bbox: BBOXtype;
+  setBbox: (newBbox: BBOXtype) => void;
   modalOpen: boolean;
   setModalOpen: (newModalOpen: boolean) => void;
   clearState: () => void;
@@ -12,7 +28,7 @@ const useStore = create(
   devtools<Store>(
     (set) => ({
       bbox: null,
-      setBbox: (newBbox: string) => set({ bbox: newBbox }, false, "setBbox"),
+      setBbox: (newBbox: BBOXtype) => set({ bbox: newBbox }, false, "setBbox"),
       modalOpen: true,
       setModalOpen: (newModalOpen: boolean) =>
         set({ modalOpen: newModalOpen }, false, "setModalOpen"),

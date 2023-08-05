@@ -9,6 +9,8 @@ import useStore from "./store.ts";
 import { parseBbox } from "./parseBbox.tsx";
 import { LngLatBounds } from "maplibre-gl";
 import wellknown from "wellknown";
+import tokml from "tokml";
+import { geojsonToArcGIS } from "@esri/arcgis-to-geojson-utils";
 
 export default function SpeedDialTooltipOpen() {
   const [open, setOpen] = React.useState(false);
@@ -42,6 +44,23 @@ export default function SpeedDialTooltipOpen() {
     navigator.clipboard.writeText(wkt);
     handleClose();
   };
+
+  const handleCopyKML = () => {
+    if (!boundingBox) return;
+    const { bboxGeometry } = parseBbox(boundingBox);
+    const kml = tokml(bboxGeometry);
+    navigator.clipboard.writeText(kml);
+    handleClose();
+  };
+
+  const handleCopyEsriJSON = () => {
+    if (!boundingBox) return;
+    const { bboxGeometry } = parseBbox(boundingBox);
+    const esriJSON = geojsonToArcGIS(bboxGeometry);
+    navigator.clipboard.writeText(JSON.stringify(esriJSON, null, 2));
+    handleClose();
+  };
+
   return (
     <Box
       sx={{
@@ -60,6 +79,7 @@ export default function SpeedDialTooltipOpen() {
         onClose={handleClose}
         onOpen={handleOpen}
         open={open}
+        hidden={boundingBox === null}
       >
         <SpeedDialAction
           icon={<FileCopyIcon />}
@@ -78,6 +98,18 @@ export default function SpeedDialTooltipOpen() {
           tooltipTitle="WKT"
           tooltipOpen
           onClick={handleCopyWKT}
+        />
+        <SpeedDialAction
+          icon={<FileCopyIcon />}
+          tooltipTitle="KML"
+          tooltipOpen
+          onClick={handleCopyKML}
+        />
+        <SpeedDialAction
+          icon={<FileCopyIcon />}
+          tooltipTitle="ESRI JSON"
+          tooltipOpen
+          onClick={handleCopyEsriJSON}
         />
       </SpeedDial>
     </Box>

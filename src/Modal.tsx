@@ -14,6 +14,7 @@ import {
   MenuItem,
   Select,
   TextField,
+  Typography,
 } from "@mui/material";
 import useStore from "./store.ts";
 
@@ -56,7 +57,7 @@ const Modal = () => {
   const ref = useRef<HTMLInputElement | HTMLTextAreaElement>();
 
   return (
-    <Dialog open={modalOpen} onClose={handleClose}>
+    <Dialog open={modalOpen}>
       <DialogTitle>Create or Display bounding box</DialogTitle>
       <DialogContent>
         <Box
@@ -65,9 +66,20 @@ const Modal = () => {
           alignItems="center"
           padding="1em"
         >
-          <Button onClick={handleCreateBoundingBox} variant={"contained"}>
+          <Button
+            onClick={handleCreateBoundingBox}
+            variant={"contained"}
+            size={"large"}
+          >
             Create a bounding box
           </Button>
+        </Box>
+        <Divider variant="inset" />
+        <Box padding="1em" textAlign={"center"}>
+          <Typography variant={"h6"}>OR</Typography>
+          <Typography variant={"body1"}>
+            Paste a bounding box in the input below
+          </Typography>
         </Box>
         <Divider variant="inset" />
         <Box padding="1em">

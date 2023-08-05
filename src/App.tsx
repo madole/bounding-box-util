@@ -1,5 +1,13 @@
 import CssBaseline from "@mui/material/CssBaseline";
-import { AppBar, Box, Button, Toolbar, Typography } from "@mui/material";
+import {
+  Alert,
+  AppBar,
+  Box,
+  Button,
+  Snackbar,
+  Toolbar,
+  Typography,
+} from "@mui/material";
 import MapLibre from "./MapLibre.tsx";
 import AddIcon from "@mui/icons-material/Add";
 import Modal from "./Modal.tsx";
@@ -7,6 +15,7 @@ import BboxLayer from "./BboxLayer.tsx";
 import useStore from "./store.ts";
 import DrawingTools from "./DrawingTools.tsx";
 import SpeedDialTooltipOpen from "./SpeedDial.tsx";
+import MapIcon from "@mui/icons-material/Map";
 
 function App() {
   const clearState = useStore((state) => state.clearState);
@@ -22,18 +31,40 @@ function App() {
       <Box sx={{ flexGrow: 1 }}>
         <AppBar position="static">
           <Toolbar>
-            <Box sx={{ flexGrow: 1 }}>
-              <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
-                Bounding Box
+            <Box
+              sx={{
+                display: "flex",
+                flexGrow: 1,
+                gap: "0.5em",
+                justifyContent: "flex-start",
+                alignItems: "center",
+              }}
+            >
+              <MapIcon />
+              <Typography
+                variant="h6"
+                component="h1"
+                textTransform={"uppercase"}
+              >
+                Bounding Box Utility
               </Typography>
             </Box>
-            <Button color="inherit" onClick={handleNewBoundingBox}>
+            <Button
+              color="inherit"
+              onClick={handleNewBoundingBox}
+              variant={"outlined"}
+            >
               <AddIcon />
               <Typography>New Bounding Box</Typography>
             </Button>
           </Toolbar>
         </AppBar>
         <Box sx={{ flexGrow: 1 }}>
+          <Snackbar open={drawingModeActive}>
+            <Alert severity="info">
+              Click on the map to start drawing a bounding box
+            </Alert>
+          </Snackbar>
           <MapLibre>
             <BboxLayer />
             {drawingModeActive && <DrawingTools />}

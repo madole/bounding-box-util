@@ -42,7 +42,13 @@ function App() {
             >
               <MapIcon />
               <Typography
-                variant="h6"
+                sx={{
+                  typography: {
+                    xs: "body2",
+                    sm: "body2",
+                    md: "h6",
+                  },
+                }}
                 component="h1"
                 textTransform={"uppercase"}
               >
@@ -55,7 +61,7 @@ function App() {
               variant={"outlined"}
             >
               <AddIcon />
-              <Typography>New Bounding Box</Typography>
+              <Typography>New Bbox</Typography>
             </Button>
           </Toolbar>
         </AppBar>

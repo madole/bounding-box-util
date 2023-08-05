@@ -1,43 +1,15 @@
 import { useEffect } from "react";
 import { useMaplibreMap } from "./MapLibre.tsx";
 import useStore from "./store.ts";
-import bboxPolygon from "@turf/bbox-polygon";
 import bbox from "@turf/bbox";
-import { GeoJSONFeature, LngLatBoundsLike } from "maplibre-gl";
-
-function parseBbox(
-  type: "bbox_string" | "geojson" | "wkt",
-  data: string | GeoJSONFeature,
-): {
-  newBbox: LngLatBoundsLike;
-  bboxGeometry: GeoJSONFeature;
-  originalGeometry?: GeoJSONFeature;
-} {
-  if (type === "bbox_string" && typeof data === "string") {
-    const coords = data.split(",").map((coord) => parseFloat(coord));
-    return {
-      newBbox: coords as LngLatBoundsLike,
-      bboxGeometry: bboxPolygon(coords),
-    };
-  } else if (type === "geojson" && typeof data === "object") {
-    return {
-      newBbox: bbox(data),
-      bboxGeometry: bboxPolygon(bbox(data)),
-      originalGeometry: data,
-    };
-  }
-  throw new Error("Invalid type");
-}
+import { parseBbox } from "./parseBbox.tsx";
 
 const BboxLayer = () => {
   const map = useMaplibreMap();
   const boundingBox = useStore((state) => state.bbox);
   useEffect(() => {
     if (!map || !boundingBox) return;
-    const { bboxGeometry, originalGeometry, newBbox } = parseBbox(
-      boundingBox.type,
-      boundingBox.data,
-    );
+    const { bboxGeometry, originalGeometry, newBbox } = parseBbox(boundingBox);
 
     map.addSource("bbox", {
       type: "geojson",

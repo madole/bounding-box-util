@@ -24,10 +24,11 @@ const Modal = () => {
     state.setModalOpen,
     state.setBbox,
   ]);
+  const activeDrawingMode = useStore((state) => state.activeDrawingMode);
   const [type, setType] = useState<Type>("bbox_string");
   const handleClose = () => setModalOpen(false);
   const handleCreateBoundingBox = () => {
-    setModalOpen(false);
+    activeDrawingMode();
   };
   const handleViewBbox = () => {
     const geometry = ref.current?.value ?? ref.current?.innerText;
@@ -133,8 +134,12 @@ const Modal = () => {
         </Box>
       </DialogContent>
       <DialogActions>
-        <Button onClick={handleClose}>Cancel</Button>
-        <Button onClick={handleViewBbox}>View Bounding Box</Button>
+        <Button onClick={handleClose} color={"warning"}>
+          Cancel
+        </Button>
+        <Button onClick={handleViewBbox} color={"primary"} variant={"outlined"}>
+          View Bounding Box
+        </Button>
       </DialogActions>
     </Dialog>
   );

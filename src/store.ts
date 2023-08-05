@@ -1,11 +1,11 @@
 import { create } from "zustand";
 import { devtools } from "zustand/middleware";
-import { GeoJSONFeature } from "maplibre-gl";
+import { FeatureCollection } from "geojson";
 
-type BBOXtype =
+export type BBOXtype =
   | {
       type: "geojson";
-      data: GeoJSONFeature;
+      data: FeatureCollection;
     }
   | {
       type: "bbox_string";
@@ -23,6 +23,9 @@ type Store = {
   modalOpen: boolean;
   setModalOpen: (newModalOpen: boolean) => void;
   clearState: () => void;
+  drawingModeActive: boolean;
+  activeDrawingMode: () => void;
+  completedDrawing: (boundingBox: FeatureCollection) => void;
 };
 const useStore = create(
   devtools<Store>(
@@ -34,6 +37,28 @@ const useStore = create(
         set({ modalOpen: newModalOpen }, false, "setModalOpen"),
       clearState: () =>
         set({ bbox: null, modalOpen: true }, false, "clearState"),
+      drawingModeActive: false,
+      setDrawingModeActive: (newDrawingModeActive: boolean) =>
+        set(
+          { drawingModeActive: newDrawingModeActive },
+          false,
+          "setDrawingModeActive",
+        ),
+      completedDrawing: (boundingBox: FeatureCollection) =>
+        set(
+          {
+            bbox: { type: "geojson", data: boundingBox },
+            drawingModeActive: false,
+          },
+          false,
+          "completedDrawing",
+        ),
+      activeDrawingMode: () =>
+        set(
+          { drawingModeActive: true, modalOpen: false },
+          false,
+          "activeDrawingMode",
+        ),
     }),
     { name: "store", serialize: { options: true } },
   ),

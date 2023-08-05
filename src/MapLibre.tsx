@@ -35,7 +35,9 @@ const MapLibreMap: React.FC<MapLibreProps> = (props) => {
 
     mapRef.current = new maplibre.Map({
       container: ref.current,
-      style: "https://demotiles.maplibre.org/style.json", // stylesheet location
+      style:
+        "https://api.maptiler.com/maps/streets-v2/style.json?key=" +
+        import.meta.env.VITE_MAP_TILER_API_KEY,
       center: [148.593018, -32.808904],
       zoom: 3, // starting zoom
     }).on("load", () => {

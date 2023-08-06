@@ -39,7 +39,8 @@ const BboxLayer = () => {
         source: "original",
         paint: {
           "line-color": "#f00",
-          "line-width": 4,
+          "line-width": 3,
+          "line-dasharray": [2, 2],
         },
       });
     }

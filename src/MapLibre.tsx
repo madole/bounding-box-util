@@ -23,6 +23,11 @@ export interface MapLibreProps {
 
 const defaultCenter: LngLatLike = [131.0369, -25.3444];
 const defaultZoom = 2;
+const navControl = new maplibre.NavigationControl({
+  showCompass: true,
+  showZoom: true,
+  visualizePitch: true,
+});
 
 const MapLibreMap: React.FC<MapLibreProps> = (props) => {
   const ref = useRef<HTMLDivElement>(null);
@@ -42,11 +47,13 @@ const MapLibreMap: React.FC<MapLibreProps> = (props) => {
       zoom: 3, // starting zoom
     }).on("load", () => {
       setLoaded(true);
+      if (!mapRef.current?.hasControl(navControl)) {
+        mapRef.current?.addControl(navControl, "top-left");
+      }
       if (window.location.search.includes("test-mode")) {
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-ignore
         window.maplibre = mapRef.current;
-        mapRef.current?.addControl(new maplibre.NavigationControl());
       }
     });
   }, [center, style, zoom]);

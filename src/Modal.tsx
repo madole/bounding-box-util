@@ -20,8 +20,12 @@ import useStore from "./store.ts";
 import DrawIcon from "@mui/icons-material/Draw";
 import { check } from "@placemarkio/check-geojson";
 import { HintError } from "@placemarkio/check-geojson/lib/errors.ts";
+import { kml as kmlToGeojson } from "@mapbox/togeojson";
+import { arcgisToGeoJSON } from "@esri/arcgis-to-geojson-utils";
+import wellknown from "wellknown";
+import { Feature } from "geojson";
 
-type Type = "wkt" | "geojson" | "bbox_string";
+type Type = "wkt" | "geojson" | "bbox_string" | "kml" | "esri";
 const Modal = () => {
   const [modalOpen, setModalOpen, setBbox] = useStore((state) => [
     state.modalOpen,
@@ -30,9 +34,7 @@ const Modal = () => {
   ]);
   const activeDrawingMode = useStore((state) => state.activeDrawingMode);
   const [type, setType] = useState<Type>("bbox_string");
-  const [notValidGeojsonError, setNotValidGeojsonError] = useState<
-    string | null
-  >(null);
+  const [invalidInput, setInvalidInput] = useState<string | null>(null);
   const handleClose = () => setModalOpen(false);
   const handleCreateBoundingBox = () => {
     activeDrawingMode();
@@ -45,8 +47,7 @@ const Modal = () => {
       geometry.length > 0
     ) {
       setBbox({ type: "bbox_string", data: geometry });
-    }
-    if (
+    } else if (
       type === "geojson" &&
       typeof geometry === "string" &&
       geometry.length > 0
@@ -56,17 +57,73 @@ const Modal = () => {
         setBbox({ type: "geojson", data: parsed });
       } catch (error) {
         if (error instanceof Error) {
-          setNotValidGeojsonError((error as HintError).issues[0].message);
+          setInvalidInput((error as HintError).issues[0].message);
         }
         return;
       }
-      setModalOpen(false);
+    } else if (
+      type === "kml" &&
+      typeof geometry === "string" &&
+      geometry.length > 0
+    ) {
+      try {
+        const dom = new DOMParser().parseFromString(geometry, "text/xml");
+        const geojson = kmlToGeojson(dom);
+        if (geojson.features.length === 0) {
+          throw new Error("No features found in KML");
+        }
+        setBbox({ type: "geojson", data: geojson });
+      } catch (error) {
+        if (error instanceof Error) {
+          setInvalidInput(error.message ?? "Failed to parse KML");
+        }
+        return;
+      }
+    } else if (
+      type === "esri" &&
+      typeof geometry === "string" &&
+      geometry.length > 0
+    ) {
+      try {
+        const parsed = arcgisToGeoJSON(JSON.parse(geometry));
+        setBbox({ type: "geojson", data: parsed });
+      } catch (error) {
+        if (error instanceof Error) {
+          setInvalidInput(error.message ?? "Failed to parse ESRI JSON");
+        }
+        return;
+      }
+    } else if (
+      type === "wkt" &&
+      typeof geometry === "string" &&
+      geometry.length > 0
+    ) {
+      try {
+        const parsed = wellknown.parse(geometry);
+        if (!parsed) {
+          throw new Error("Failed to parse WKT");
+        }
+        setBbox({
+          type: "geojson",
+          data: {
+            type: "Feature",
+            geometry: parsed,
+          } as Feature,
+        });
+      } catch (error) {
+        if (error instanceof Error) {
+          setInvalidInput((error as HintError).issues[0].message);
+        }
+        return;
+      }
     }
+
+    setModalOpen(false);
   };
   const ref = useRef<HTMLInputElement | HTMLTextAreaElement>();
 
   return (
-    <Dialog open={modalOpen}>
+    <Dialog open={modalOpen} fullWidth={true}>
       <DialogTitle>Create or Display bounding box</DialogTitle>
       <DialogContent>
         <Box
@@ -117,7 +174,9 @@ const Modal = () => {
                 Comma Separated Bounding Box
               </MenuItem>
               <MenuItem value={"geojson"}>Geojson</MenuItem>
-              {/*<MenuItem value={"wkt"}>Well Known Text</MenuItem>*/}
+              <MenuItem value={"kml"}>KML</MenuItem>
+              <MenuItem value={"esri"}>ESRI JSON</MenuItem>
+              <MenuItem value={"wkt"}>Well Known Text</MenuItem>
             </Select>
           </FormControl>
           {type === "bbox_string" && (
@@ -148,14 +207,56 @@ const Modal = () => {
                 inputRef={ref}
                 minRows={5}
                 multiline
-                onChange={() => setNotValidGeojsonError(null)}
+                onChange={() => setInvalidInput(null)}
               />
-              {notValidGeojsonError && (
-                <Typography variant={"body1"} color={"error"}>
-                  {notValidGeojsonError}
-                </Typography>
-              )}
             </>
+          )}
+          {type === "kml" && (
+            <>
+              <DialogContentText>
+                Paste your KML in here to get the bounding box
+              </DialogContentText>
+              <OutlinedInput
+                type={"textarea"}
+                style={{ width: "100%", minHeight: "2em" }}
+                inputRef={ref}
+                minRows={5}
+                multiline
+              />
+            </>
+          )}
+          {type === "esri" && (
+            <>
+              <DialogContentText>
+                Paste your ESRI JSON in here to get the bounding box
+              </DialogContentText>
+              <OutlinedInput
+                type={"textarea"}
+                style={{ width: "100%", minHeight: "2em" }}
+                inputRef={ref}
+                minRows={5}
+                multiline
+              />
+            </>
+          )}
+          {type === "wkt" && (
+            <>
+              <DialogContentText>
+                Paste your Well Known Text in here to get the bounding box
+              </DialogContentText>
+              <OutlinedInput
+                type={"textarea"}
+                style={{ width: "100%", minHeight: "2em" }}
+                inputRef={ref}
+                minRows={5}
+                multiline
+              />
+            </>
+          )}
+          {invalidInput && (
+            <Typography variant={"body1"} color={"error"}>
+              {invalidInput}
+            </Typography>
           )}
         </Box>
       </DialogContent>

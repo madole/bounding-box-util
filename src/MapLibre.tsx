@@ -46,6 +46,7 @@ const MapLibreMap: React.FC<MapLibreProps> = (props) => {
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-ignore
         window.maplibre = mapRef.current;
+        mapRef.current?.addControl(new maplibre.NavigationControl());
       }
     });
   }, [center, style, zoom]);

@@ -18,6 +18,7 @@
     "@mapbox/mapbox-gl-draw": "^1.4.2",
     "@mui/icons-material": "^5.14.3",
     "@mui/material": "^5.14.3",
+    "@placemarkio/check-geojson": "^0.1.12",
     "@turf/bbox": "^6.5.0",
     "@turf/bbox-polygon": "^6.5.0",
     "@types/geojson": "^7946.0.10",

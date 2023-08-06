@@ -1,11 +1,11 @@
 import { create } from "zustand";
 import { devtools } from "zustand/middleware";
-import { FeatureCollection } from "geojson";
+import { GeoJSON } from "geojson";
 
 export type BBOXtype =
   | {
       type: "geojson";
-      data: FeatureCollection;
+      data: GeoJSON;
     }
   | {
       type: "bbox_string";
@@ -25,7 +25,7 @@ type Store = {
   clearState: () => void;
   drawingModeActive: boolean;
   activeDrawingMode: () => void;
-  completedDrawing: (boundingBox: FeatureCollection) => void;
+  completedDrawing: (boundingBox: GeoJSON) => void;
 };
 const useStore = create(
   devtools<Store>(
@@ -44,7 +44,7 @@ const useStore = create(
           false,
           "setDrawingModeActive",
         ),
-      completedDrawing: (boundingBox: FeatureCollection) =>
+      completedDrawing: (boundingBox: GeoJSON) =>
         set(
           {
             bbox: { type: "geojson", data: boundingBox },

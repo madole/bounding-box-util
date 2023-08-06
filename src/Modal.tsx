@@ -9,14 +9,17 @@ import {
   DialogTitle,
   Divider,
   FormControl,
-  Input,
   InputLabel,
   MenuItem,
+  OutlinedInput,
   Select,
   TextField,
   Typography,
 } from "@mui/material";
 import useStore from "./store.ts";
+import DrawIcon from "@mui/icons-material/Draw";
+import { check } from "@placemarkio/check-geojson";
+import { HintError } from "@placemarkio/check-geojson/lib/errors.ts";
 
 type Type = "wkt" | "geojson" | "bbox_string";
 const Modal = () => {
@@ -27,6 +30,9 @@ const Modal = () => {
   ]);
   const activeDrawingMode = useStore((state) => state.activeDrawingMode);
   const [type, setType] = useState<Type>("bbox_string");
+  const [notValidGeojsonError, setNotValidGeojsonError] = useState<
+    string | null
+  >(null);
   const handleClose = () => setModalOpen(false);
   const handleCreateBoundingBox = () => {
     activeDrawingMode();
@@ -46,13 +52,16 @@ const Modal = () => {
       geometry.length > 0
     ) {
       try {
-        const parsed = JSON.parse(geometry);
+        const parsed = check(geometry);
         setBbox({ type: "geojson", data: parsed });
       } catch (error) {
-        console.error(error);
+        if (error instanceof Error) {
+          setNotValidGeojsonError((error as HintError).issues[0].message);
+        }
+        return;
       }
+      setModalOpen(false);
     }
-    setModalOpen(false);
   };
   const ref = useRef<HTMLInputElement | HTMLTextAreaElement>();
 
@@ -71,6 +80,7 @@ const Modal = () => {
             variant={"contained"}
             size={"large"}
           >
+            <DrawIcon sx={{ marginRight: "0.5em" }} />
             Create a bounding box
           </Button>
         </Box>
@@ -118,7 +128,6 @@ const Modal = () => {
               </DialogContentText>
               <TextField
                 inputRef={ref}
-                autoFocus
                 margin="dense"
                 id="name"
                 label="Bounding Box"
@@ -133,14 +142,19 @@ const Modal = () => {
               <DialogContentText>
                 Paste your geojson in here to get the bounding box
               </DialogContentText>
-              <Input
+              <OutlinedInput
                 type={"textarea"}
                 style={{ width: "100%", minHeight: "2em" }}
-                autoFocus={true}
                 inputRef={ref}
                 minRows={5}
                 multiline
+                onChange={() => setNotValidGeojsonError(null)}
               />
+              {notValidGeojsonError && (
+                <Typography variant={"body1"} color={"error"}>
+                  {notValidGeojsonError}
+                </Typography>
+              )}
             </>
           )}
         </Box>

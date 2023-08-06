@@ -1,13 +1,13 @@
 import { LngLatBoundsLike } from "maplibre-gl";
 import bboxPolygon from "@turf/bbox-polygon";
 import bbox from "@turf/bbox";
-import { FeatureCollection } from "geojson";
+import { GeoJSON } from "geojson";
 import { BBOXtype } from "./store.ts";
 
 type ReturnType = {
   newBbox: LngLatBoundsLike;
-  bboxGeometry: FeatureCollection;
-  originalGeometry?: FeatureCollection;
+  bboxGeometry: GeoJSON;
+  originalGeometry?: GeoJSON;
 };
 
 export function parseBbox(boundingBox: BBOXtype): ReturnType {

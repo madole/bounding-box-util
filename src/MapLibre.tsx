@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from "react";
 import * as maplibre from "maplibre-gl";
 import { LngLatLike } from "maplibre-gl";
 import "maplibre-gl/dist/maplibre-gl.css";
-import { Box } from "@mui/material";
+import { Box, styled } from "@mui/material";
 
 const MapContext = React.createContext<maplibre.Map | null>(null);
 
@@ -59,7 +59,16 @@ const MapLibreMap: React.FC<MapLibreProps> = (props) => {
   }, [center, style, zoom]);
 
   return (
-    <Box sx={{ height: "93vh", width: "100vw" }} ref={ref}>
+    <Box
+      sx={{
+        height: {
+          xs: "calc(100vh - 56px)",
+          sm: "calc(100vh - 64px)",
+        },
+        width: "100vw",
+      }}
+      ref={ref}
+    >
       {loaded && (
         <MapContext.Provider value={mapRef.current}>
           {children}

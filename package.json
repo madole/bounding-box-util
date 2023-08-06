@@ -19,10 +19,10 @@
     "@mapbox/togeojson": "^0.16.0",
     "@mui/icons-material": "^5.14.3",
     "@mui/material": "^5.14.3",
-    "@placemarkio/check-geojson": "^0.1.12",
     "@turf/bbox": "^6.5.0",
     "@turf/bbox-polygon": "^6.5.0",
     "@types/geojson": "^7946.0.10",
+    "geojson-validation": "^1.0.2",
     "maplibre-gl": "^3.2.1",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
@@ -31,6 +31,7 @@
     "zustand": "^4.4.0"
   },
   "devDependencies": {
+    "@types/geojson-validation": "^1.0.0",
     "@types/mapbox__mapbox-gl-draw": "^1.4.0",
     "@types/react": "^18.2.15",
     "@types/react-dom": "^18.2.7",

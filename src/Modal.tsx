@@ -18,8 +18,7 @@ import {
 } from "@mui/material";
 import useStore from "./store.ts";
 import DrawIcon from "@mui/icons-material/Draw";
-import { check } from "@placemarkio/check-geojson";
-import { HintError } from "@placemarkio/check-geojson/lib/errors.ts";
+import geojsonValidation from "geojson-validation";
 import { kml as kmlToGeojson } from "@mapbox/togeojson";
 import { arcgisToGeoJSON } from "@esri/arcgis-to-geojson-utils";
 import wellknown from "wellknown";
@@ -53,11 +52,16 @@ const Modal = () => {
       geometry.length > 0
     ) {
       try {
-        const parsed = check(geometry);
+        debugger;
+        const parsed = JSON.parse(geometry);
+        const validationErrors = geojsonValidation.valid(parsed, true);
+        if (validationErrors.length > 0) {
+          throw new Error(validationErrors[0]);
+        }
         setBbox({ type: "geojson", data: parsed });
       } catch (error) {
         if (error instanceof Error) {
-          setInvalidInput((error as HintError).issues[0].message);
+          setInvalidInput(error.message);
         }
         return;
       }
@@ -112,7 +116,7 @@ const Modal = () => {
         });
       } catch (error) {
         if (error instanceof Error) {
-          setInvalidInput((error as HintError).issues[0].message);
+          setInvalidInput(error.message);
         }
         return;
       }
@@ -254,7 +258,15 @@ const Modal = () => {
             </>
           )}
           {invalidInput && (
-            <Typography variant={"body1"} color={"error"}>
+            <Typography
+              variant={"body1"}
+              color={"error"}
+              sx={{
+                "&:first-letter": {
+                  textTransform: "capitalize",
+                },
+              }}
+            >
               {invalidInput}
             </Typography>
           )}

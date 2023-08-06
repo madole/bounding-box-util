@@ -7,6 +7,7 @@ import {
   Snackbar,
   Toolbar,
   Typography,
+  useMediaQuery,
 } from "@mui/material";
 import MapLibre from "./MapLibre.tsx";
 import AddIcon from "@mui/icons-material/Add";
@@ -24,6 +25,7 @@ function App() {
   const handleNewBoundingBox = () => {
     clearState();
   };
+  const isBiggerThanMobile = useMediaQuery("(min-width:600px)");
   return (
     <>
       <CssBaseline />
@@ -52,7 +54,7 @@ function App() {
                 component="h1"
                 textTransform={"uppercase"}
               >
-                Bounding Box Utility
+                {isBiggerThanMobile ? "Bounding Box" : "BBox"} Utility Kit
               </Typography>
             </Box>
             <Button

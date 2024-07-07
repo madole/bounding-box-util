@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from "react";
 import * as maplibre from "maplibre-gl";
 import { LngLatLike } from "maplibre-gl";
 import "maplibre-gl/dist/maplibre-gl.css";
-import { Box, styled } from "@mui/material";
+import { Box } from "@mui/material";
 
 const MapContext = React.createContext<maplibre.Map | null>(null);
 

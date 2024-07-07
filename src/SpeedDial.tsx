@@ -11,9 +11,11 @@ import { LngLatBounds } from "maplibre-gl";
 import wellknown from "wellknown";
 import tokml from "tokml";
 import { geojsonToArcGIS } from "@esri/arcgis-to-geojson-utils";
+import { Alert, Slide, Snackbar } from "@mui/material";
 
 export default function SpeedDialTooltipOpen() {
   const [open, setOpen] = React.useState(false);
+  const [copied, setCopied] = React.useState(false);
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
   const boundingBox = useStore((state) => state.bbox);
@@ -26,6 +28,7 @@ export default function SpeedDialTooltipOpen() {
       navigator.clipboard.writeText(bboxString);
     }
     handleClose();
+    setCopied(true);
   };
 
   const handleCopyGeojson = () => {
@@ -33,6 +36,7 @@ export default function SpeedDialTooltipOpen() {
     const { bboxGeometry } = parseBbox(boundingBox);
     navigator.clipboard.writeText(JSON.stringify(bboxGeometry, null, 2));
     handleClose();
+    setCopied(true);
   };
 
   const handleCopyWKT = () => {
@@ -43,6 +47,7 @@ export default function SpeedDialTooltipOpen() {
     const wkt = wellknown.stringify(bboxGeometry);
     navigator.clipboard.writeText(wkt);
     handleClose();
+    setCopied(true);
   };
 
   const handleCopyKML = () => {
@@ -51,6 +56,7 @@ export default function SpeedDialTooltipOpen() {
     const kml = tokml(bboxGeometry);
     navigator.clipboard.writeText(kml);
     handleClose();
+    setCopied(true);
   };
 
   const handleCopyEsriJSON = () => {
@@ -59,6 +65,7 @@ export default function SpeedDialTooltipOpen() {
     const esriJSON = geojsonToArcGIS(bboxGeometry);
     navigator.clipboard.writeText(JSON.stringify(esriJSON, null, 2));
     handleClose();
+    setCopied(true);
   };
 
   return (
@@ -112,6 +119,26 @@ export default function SpeedDialTooltipOpen() {
           onClick={handleCopyEsriJSON}
         />
       </SpeedDial>
+      <Snackbar
+        open={copied}
+        autoHideDuration={3000}
+        onClose={() => {
+          setCopied(false);
+        }}
+        message="Bbox copied."
+        anchorOrigin={{ vertical: "bottom", horizontal: "left" }}
+        TransitionComponent={Slide}
+      >
+        <Alert
+          onClose={() => {
+            setCopied(false);
+          }}
+          severity="success"
+          variant="filled"
+        >
+          Bbox copied.
+        </Alert>
+      </Snackbar>
     </Box>
   );
 }
